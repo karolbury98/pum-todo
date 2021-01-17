@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pum_todo/models/task_model.dart';
 
 class AddTaskScreen extends StatefulWidget {
+
+  final Task task;
+
+  AddTaskScreen({this.task});
+
   @override
   _AddTaskScreenState createState() => _AddTaskScreenState();
 }
@@ -19,6 +25,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.task != null) {
+      _title = widget.task.title;
+      _date = widget.task.date;
+      _priority = widget.task.priority;
+    }
+
     _dateController.text = _dateFormatter.format(_date);
   }
 
