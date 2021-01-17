@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pum_todo/helpers/database_helper.dart';
 import 'package:pum_todo/models/task_model.dart';
 
 class AddTaskScreen extends StatefulWidget {
 
+  final Function updateTaskList;
   final Task task;
 
-  AddTaskScreen({this.task});
+  AddTaskScreen({this.updateTaskList, this.task});
 
   @override
   _AddTaskScreenState createState() => _AddTaskScreenState();
@@ -56,16 +58,30 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
+  _delete() {
+    DatabaseHelper.instance.deleteTask(widget.task.id);
+    widget.updateTaskList();
+    Navigator.pop(context);
+  }
+
   _submit() {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       print('$_title, $_date, $_priority');
 
       //Dodanie zadania do bazy danych
+      Task task = Task(title: _title, date: _date, priority: _priority);
+      if (widget.task == null) {
+        task.status = 0;
+        DatabaseHelper.instance.insertTask(task);
+      } else{
+        //Zaktualizowanie zadania
+        task.id = widget.task.id;
+        task.status = widget.task.status;
+        DatabaseHelper.instance.updateTask(task);
+      }
 
-      //Zaktualizowanie zadania
-
-
+      widget.updateTaskList();
       Navigator.pop(context);
     }
   }
@@ -91,7 +107,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               SizedBox(height: 20.0),
               Text(
-                'Dodaj zadanie',
+               widget.task == null ? 'Dodaj zadanie' : 'Zaktualizuj zadanie',
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 30.0,
@@ -182,14 +198,32 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           ),
                           child: FlatButton(
                               child: Text(
-                                'Dodaj',
+                                widget.task == null ? 'Dodaj' : 'Zaktualizuj',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20.0),
                               ),
                             onPressed: _submit,
                           ),
-                        )
+                        ),
+                        widget.task != null ? Container(
+                          margin: EdgeInsets.symmetric(vertical: 20.0),
+                          height: 60.0,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          child: FlatButton(
+                            child: Text(
+                              'Usuń',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20.0),
+                            ),
+                            onPressed: _delete,
+                          ),
+                        ) : SizedBox.shrink(),
                        ],
                    ),
                 ),

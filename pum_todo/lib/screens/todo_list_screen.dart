@@ -52,12 +52,13 @@ class _TodoListScreenState extends State<TodoListScreen> {
               _updateTaskList();
             },
               activeColor: Theme.of(context).primaryColor,
-              value: true,
+              value: task.status == 1 ? true : false,
             ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => AddTaskScreen(
+                  updateTaskList: _updateTaskList,
                   task: task,
                 ),
               ),
@@ -77,7 +78,12 @@ class _TodoListScreenState extends State<TodoListScreen> {
       floatingActionButton: FloatingActionButton(
           backgroundColor: Theme.of(context).primaryColor,
           child: Icon(Icons.add),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AddTaskScreen(),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AddTaskScreen(
+                updateTaskList: _updateTaskList,
+              ),
           ),
           ),
       ),
@@ -104,16 +110,16 @@ class _TodoListScreenState extends State<TodoListScreen> {
                     children: <Widget>[
                       Text('Moje zadania', style: TextStyle(
                         color: Colors.black,
-                        fontSize: 35.0,
+                        fontSize: 40.0,
                         fontWeight: FontWeight.bold,
                       ),
                       ),
                       SizedBox(height: 10.0),
                       Text(
-                        '${completedTaskCount} z ${snapshot.data.length}',
+                        'Wykonano ${completedTaskCount} z ${snapshot.data.length}',
                         style: TextStyle(
                         color: Colors.grey,
-                        fontSize: 25.0,
+                        fontSize: 20.0,
                         fontWeight: FontWeight.w600,
                       ),
                       ),
@@ -121,7 +127,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
             ),
               );
             }
-            return _buildTask(snapshot.data(index - 1));
+            return _buildTask(snapshot.data[index - 1]);
           },
         );
         },
